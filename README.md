@@ -1,2 +1,2 @@
-# 2DFreeformDQN
+# 2DFreeform
 2D metasurface freeform optimization
