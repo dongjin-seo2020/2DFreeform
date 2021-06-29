@@ -27,9 +27,67 @@ S = S4.New(Lattice=((period,0),(0,period/2)), NumBasis=nG)
 
 # Permittivities & thickness[um]
 eps_SiO2 = 1.4504**2
-eps_Si = 3.5750**2
+eps_Si = 3.5750**2   #shd be altered
 grating_thickness = 0.325
 
 #import & save the structure
 gratingMatrix = np.load('struct.npy')
 np.savetxt('gratingMatrix.csv',gratingMatrix,delimiter=",")
+
+xnum = np.shape(gratingMatrix)[0]
+ynum = np.shape(gratingMatrix)[1]
+print('x: ', xnum, ' y: ', ynum)
+
+
+start = time.time()
+
+S.SetFrequency(freq)
+S.SetMaterial(Name = 'SiO2', Epsilon = eps_SiO2)
+S.SetMaterial(Name = 'Vacuum', Epsilon = 1)
+S.SetMaterial(Name = 'Si', Epsilon = eps_Si)
+
+S.AddLayer(Name = 'top', Thickness = 0, Material= 'Si')
+S.AddLayer(Name = 'grating', Thickness = grating_thickness, Material = 'Vacuum')
+S.AddLayer(Name = 'bottom', Thickness = 0, Material = 'Vacuum')
+
+S.SetExcitationPlanewave(
+        IncidenceAngles = (0,0),
+        sAmplitude = 0,
+        pAmplitude = 1
+        )
+
+S.SetOptions( # these are the defaults
+    Verbosity = 1,
+    LatticeTruncation = 'Circular',
+    DiscretizedEpsilon = False,
+    DiscretizationResolution = 8,
+    PolarizationDecomposition = True,
+    PolarizationBasis = 'Normal',
+    LanczosSmoothing = False,
+    SubpixelSmoothing = False,
+    ConserveMemory = False
+    )
+
+for i1 in range(xnum):
+    for i2 in range(ynum):
+        if gratingMatrix[i1][i2]:
+            S.SetRegionRectangle(
+                        Layer='grating',
+                        Material = 'SiO2',
+                        #Center = ((i1-(howMany-1)/2)*period/howMany,(i2-(howMany-1)/2)*period/howMany),
+                        Center = (-period/2+period/(2*xnum) + i1*(period/xnum), -period/4+period/(4*ynum) + i2*(period/ynum)),
+                        Angle = 0,
+                        Halfwidths = (period/(2*xnum), period/(4*ynum))
+                        )
+    
+
+P = np.asarray(S.GetPowerFluxByOrder(Layer = 'bottom', zOffset = 0))
+efficiency = np.real(P[1,0])*100
+end = time.time()
+
+timecost = end - start
+
+print('time8')
+print(timecost)
+print('eff8')
+print(efficiency)
