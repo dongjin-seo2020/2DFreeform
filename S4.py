@@ -11,7 +11,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--nG', default=100, help="diffraction order", type=int)
 parser.add_argument('--wl', default=1250, help = "wavelength", type=float)
 parser.add_argument('--ang', default=55, help ="angle", type=float)
-parser.add_argument('--ncells', default=64, help ="number of cells", type=int)
+parser.add_argument('--ncells', default=256, help ="number of cells", type=int)
 
 args = parser.parse_args()
 
@@ -34,8 +34,8 @@ grating_thickness = 0.325
 gratingMatrix = np.load('struct.npy')
 np.savetxt('gratingMatrix.csv',gratingMatrix,delimiter=",")
 
-xnum = np.shape(gratingMatrix)[0]
-ynum = np.shape(gratingMatrix)[1]
+ynum = np.shape(gratingMatrix)[0]
+xnum = np.shape(gratingMatrix)[1]
 print('x: ', xnum, ' y: ', ynum)
 
 
@@ -70,7 +70,7 @@ S.SetOptions( # these are the defaults
 
 for i1 in range(xnum):
     for i2 in range(ynum):
-        if gratingMatrix[i1][i2]:
+        if gratingMatrix[i2][i1]:
             S.SetRegionRectangle(
                         Layer='grating',
                         Material = 'SiO2',
@@ -87,7 +87,27 @@ end = time.time()
 
 timecost = end - start
 
-print('time8')
-print(timecost)
-print('eff8')
-print(efficiency)
+print('time1')
+print(timecost,  's')
+print('eff1')
+print(efficiency,  '%')
+
+
+
+
+Glist = S.GetBasisSet()
+(fo, bo)= S.GetPoyntingFlux(Layer = 'top')
+
+Pi = S.GetPowerFluxByOrder(Layer = 'grating')
+Po = S.GetPowerFluxByOrder(Layer = 'bottom')
+diff_air = abs(Po[0][0])
+diff_glass = abs(Pi[1][1])
+effs = diff_glass/diff_air
+
+end2 = time.time()
+print('time2')
+print(end2-end, 's')
+print('eff2')
+print(effs, '%')
+
+        
