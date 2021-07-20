@@ -21,13 +21,13 @@ parm = res0;
 nmat = pattern*(n_Si - n_air) + n_air;
 dx = period(1)/m;
 dy = period(2)/n;
-x = [1:m]*dx - 0.5*per;
-y = [1:n]*dy - 0.5*0.5*wavelength;
-xy = meshgrid(y,x);
+x = [1:m]*dx - 0.5*period(1);
+y = [1:n]*dy - 0.5*period(2);
+[X,Y] = meshgrid(y,x);
  
 textures =cell(1,3);
 textures{1}= n_air; % Uniform, top layer
-textures{2} = {xy,nmat};
+textures{2} = {[X,Y],nmat};
 textures{3}= n_glass; % Uniform, bottom layer
 profile = {[0, thickness, 0], [1, 2, 3]};
 aa = res1(wavelength,period,textures,nns,k_parallel,angle_delta);
