@@ -1,4 +1,4 @@
-function [ N ] = get_Eff_2D(nn, img, wavelength, angle)
+function [ abseff ] = get_Eff_2D(nn, pattern, wavelength, angle)
  
 n_air = 1;
 n_glass = 1.45;
@@ -31,7 +31,7 @@ aa = res1(wavelength,period,textures,nns,k_parallel,angle_delta);
 two_D_TM = res2(aa, profile);
 theta_arr = two_D_TM.TMinc_bottom_transmitted.theta-angle ;
 %idx = find(abs(theta_arr) == min(abs(theta_arr)));
-abseff = two_D_TM.TMinc_bottom_transmitted.efficiency_TM(1);
+abseff = two_D_TM.TMinc_bottom_transmitted.efficiency_TM(2);
  
  
 end
